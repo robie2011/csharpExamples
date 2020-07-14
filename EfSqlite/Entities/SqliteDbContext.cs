@@ -24,8 +24,7 @@ namespace EfSqlite.Entities
             modelBuilder.Entity<Tree>();
 
             optionsBuilder
-                .UseSqlite(@"DataSource=mydatabase.db")
-                .UseSnakeCaseNamingConvention();
+                .UseSqlite(@"DataSource=mydatabase.db");
         }
     }
 }
