@@ -12,7 +12,7 @@ namespace EfSqlite.Tests
         [Fact]
         public void Persistence_PersistsData_CanLoadSavedData()
         {
-            using var context = new ContextBuilder()
+            using var context = new SqliteInMemoryContextBuilder()
                 .AddEntity<Tree>()
                 .AddEntity<Leaf>()
                 .Build();
@@ -33,7 +33,7 @@ namespace EfSqlite.Tests
         [Fact]
         public void Persistence_DifferentContexts_HasNoSharedState()
         {
-            using var context = new ContextBuilder()
+            using var context = new SqliteInMemoryContextBuilder()
                 .AddEntity<Tree>()
                 .AddEntity<Leaf>()
                 .Build();
@@ -43,7 +43,7 @@ namespace EfSqlite.Tests
             context.Add(CreateTreeWithTwoLeafs());
             context.SaveChanges();
             
-            using var context2 = new ContextBuilder()
+            using var context2 = new SqliteInMemoryContextBuilder()
                 .AddEntity<Tree>()
                 .AddEntity<Leaf>()
                 .Build();

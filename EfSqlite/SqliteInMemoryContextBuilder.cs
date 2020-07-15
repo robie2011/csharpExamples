@@ -6,20 +6,22 @@ using EfSqlite.Tests;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace EfSqlite
 {
-    public class ContextBuilder
+    public class SqliteInMemoryContextBuilder
     {
         private readonly IEnumerable<Type> _types;
 
-        public ContextBuilder(IEnumerable<Type>? types = null)
+        public SqliteInMemoryContextBuilder(IEnumerable<Type>? types = null)
             => _types = types ?? Enumerable.Empty<Type>();
 
-        public ContextBuilder AddEntity<T>()
-            => new ContextBuilder(_types.Append(typeof(T)));
+        public SqliteInMemoryContextBuilder AddEntity<T>()
+            => new SqliteInMemoryContextBuilder(_types.Append(typeof(T)));
 
-        public SqliteDbContext Build()
+        public SqliteDbContext Build(ILoggerFactory? loggerFactory = null)
         {
             var sqliteConventions = SqliteConventionSetBuilder.Build();
             var modelBuilder = new ModelBuilder(sqliteConventions);
@@ -32,6 +34,9 @@ namespace EfSqlite
                     .UseSqlite(connection)
                     .UseModel(modelBuilder.FinalizeModel())
                     .UseSnakeCaseNamingConvention()
+                    .UseLoggerFactory(loggerFactory ?? new NullLoggerFactory())
+                    .EnableDetailedErrors()
+                    .EnableSensitiveDataLogging()
                 ;
             return new SqliteDbContext(optionsBuilder.Options, connection);
         }

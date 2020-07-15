@@ -3,6 +3,7 @@ using System.Linq;
 using EfSqlite.Entities;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
+using Xunit.Abstractions;
 using static EfSqlite.Entities.InitDb;
 
 namespace EfSqlite.Tests
@@ -12,7 +13,7 @@ namespace EfSqlite.Tests
         [Fact]
         public void AccessInverseProperty_InverseAvailable_CanNavigate()
         {
-            using var context = new ContextBuilder()
+            using var context = new SqliteInMemoryContextBuilder()
                 .AddEntity<Tree>()
                 .AddEntity<Leaf>()
                 .Build();
@@ -32,6 +33,12 @@ namespace EfSqlite.Tests
             
             context.AddRange(trees);
             context.SaveChanges();
+
+            var x = context.Set<Tree>()
+                .Where(t => t.Id == 1)
+                .SelectMany(t => t.Leaves)
+                .OrderBy(l => l.Id)
+                .Take(10);
 
             // testing complex navigation query
             Assert.Equal(
